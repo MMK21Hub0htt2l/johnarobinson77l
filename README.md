@@ -130,7 +130,7 @@ At the beginning when the k-d tree is still relatively full, each search require
 | 1600 | 1600 | 2560000 | 31.752 |
 | 2400 | 2400 | 5760000 | 72.082 |
 | 3200 | 3200 | 10240000 | 128.382 |
-
+<img src="./DBSCANchart.svg">
 
 Of course, less evenly distributed data will probably show less linear growth but the deleting the items from the k-d tree will always help.
 
