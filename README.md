@@ -25,76 +25,48 @@ Cluster objects are in the dbscan\_clusters.cluster array list. Each cluster obj
 
 This source code example below can be found in the main function in DBSCANClusters.Java
 
-**(1.)**
-
-**long** [] latLonTime = **new long** [3];
-
-KdTreeEx\&lt;Integer\&gt; fKdTree = **new** KdTreeEx\&lt;Integer\&gt;(( **int** )locations.size(), 3);
-
-fKdTree.setNumThreads(Runtime._getRuntime_().availableProcessors());
-
-**(2.)**
-
-**for** ( **int** idx = 0;  idx \&lt; locations.size(); idx++){
-
-   _// feed the kdTree_
-
-_   _latLonTime[0] = locations.get(idx).getLatitudeE7();
-
+```java
+(1.)
+long[] latLonTime = new long[3];
+KdTreeEx<Integer> fKdTree = new KdTreeEx<Integer>((int)locations.size(), 3);
+fKdTree.setNumThreads(Runtime.getRuntime().availableProcessors());
+(2.)
+for (int idx = 0;  idx < locations.size(); idx++){
+   // feed the kdTree
+   latLonTime[0] = locations.get(idx).getLatitudeE7();
    latLonTime[1] = locations.get(idx).getLongitudeE7();
-
    latLonTime[2] = locations.get(idx).getTimeStampLong();
-
-    **if** (0 \&gt; fKdTree.add(latLonTime, idx)) {
-
-       System. **out**.println( **&quot;fKdTree data input error at &quot;** + idx);
-
+   if (0 > fKdTree.add(latLonTime, idx)) {
+       System.out.println("fKdTree data input error at " + idx);
    }
-
 }
-
-**long** overallTime = System._currentTimeMillis_();
-
-**(3.)**
-
+long overallTime = System.currentTimeMillis();
+(3.)
 fKdTree.buildTree();
 
-**(4.)**
+(4.)
+// create a DBSCAN_Clusters object and override the getPoint fuction to get access to the location data.
+DBSCAN_Clusters visitCluster = new DBSCAN_Clusters(3);
 
-_// create a DBSCAN\_Clusters object and override the getPoint fuction to get access to the location data._
-
-DBSCAN\_Clusters visitCluster = **new** DBSCAN\_Clusters(3);
-
-**long** clusterTime = System._currentTimeMillis_();
-
-_// get the search range to about cluster distance window_
-
-**long** [] window = {searchRad, searchRad,searchRad};
-
-**(5.)**
-
-_// step through every point to make sure it&#39;s been added to a cluster._
-
+long clusterTime = System.currentTimeMillis();
+// get the search range to about cluster distance window
+long[] window = {searchRad, searchRad,searchRad};
+(5.)
+// step through every point to make sure it's been added to a cluster.
 visitCluster.buildCluster(fKdTree, window);
 
-**long** currentTime =  System._currentTimeMillis_();
-
-**final double** sC = ( **double** ) (currentTime - clusterTime) / 1000.;
-
-**final double** sO = ( **double** ) (currentTime - overallTime) / 1000;
-
-System. **out**.printf( **&quot;Cluster time = %.3f**** \n ****&quot;** , sC);
-
-System. **out**.printf( **&quot;Overall time = %.3f**** \n ****&quot;** , sO);
-
-**(6.)**
-
-**if** (!visitCluster.checkClusters(( **int** )locations.size())) {
-
-   System._exit_(1);
-
+long currentTime =  System.currentTimeMillis();
+final double sC = (double) (currentTime - clusterTime) / 1000.;
+final double sO = (double) (currentTime - overallTime) / 1000;
+System.out.printf("Cluster time = %.3f\n", sC);
+System.out.printf("Overall time = %.3f\n", sO);
+(6.)
+if (!visitCluster.checkClusters((int)locations.size())) {
+   System.exit(1);
 }
 
+
+```
 ## Notes on Implementation
 
 The DBSCAN clustering algorithm  works as follows
