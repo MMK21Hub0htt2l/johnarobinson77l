@@ -1,7 +1,5 @@
 # DBSCAN Clustering Implementation Using a Kd Tree
 
-UNDER CONSTRUCTION
-
 The code included here implements the popular DBSCAN clustering algorithm [1] in Java.  This implementation uses a k-d tree to accelerate the process of building the clusters.  The k-d tree code is also presented here.  Using a k-d tree improves the performance of the clustering in two essential ways.
 
 First, the k-d implementation is highly optimized to build and search the tree using multithreading, significantly reducing the time needed for window searches.
@@ -21,7 +19,7 @@ In the example below that data is stored as a class in the Locations class.  The
 5. Call the build method with the build k-d tree and the search window
 6. Call the checkCluster function to get the statistics of the clustering
 
-Cluster objects are in the dbscan\_clusters.cluster array list. Each cluster object contains an array of indices back to the Locations object. It also can contain bounds of that data
+Cluster objects are in the DBSCAN_clusers.clusters array list. Each cluster object contains an array of indices back to the Locations object. It also can contain bounds of that data
 
 This source code example below can be found in the main function in DBSCANClusters.Java
 
@@ -85,11 +83,17 @@ Using the k-d tree for the above algorithm helps in the following ways.
 2. There is a remove method that removes items from the k-d tree.  Other descriptions of DBSCAN algorithms such as [https://en.wikipedia.org/wiki/DBSCAN](https://en.wikipedia.org/wiki/DBSCAN) talk about tagging each item added to a cluster so that it can be ignored if it is returned in a future dataset search.  But by deleting the item from the k-d tree, that item will never show up in a future sort, so tagging is not necessary.
 3. The KdTreeEx class has a method that chooses an arbitrary item from the k-d tree and removes it from the tree at the same time.  This makes it easy to find the items to seed a new cluster within that it will only choose items that have not been deleted.
 
+### Differences fro Original Paper
+
+This implementation uses a hypercube search instead of a radial search to search for adjacent points to add to a cluster.  An additional search method could be added to the KdTree class to test against the radial distance from the center instead of being inside the hypercube.  Because of the sum of squares calculation required for a radial distance test, this choice of search kernel will be slower.  Of course, it depends on the particular needs.
+
+Another difference is that this code does not explicitly implement the noise part of DBSCAN.  It would be easy to add a Min Cluster size parameter to buildClusters() method.  Or a &quot;noise&quot; tag could be added to each cluster by looping over the clusters in the DBSCAN\_Clusters.clusters list.  There is a sort() method that sorts clusters by size in the DBSCAN\_Cluster class which could aid in doing that tagging.
+
 ## Performance
 
 The tests run on the simple dataset generated in main() show that removing data from the k-d tree as they are added to a cluster, results in a near-linear performance as a function of data points in the dataset.  Note that building the k-d tree is O(kn log n) but so the overall time can&#39;t exactly linear but the k-d tree build time is only about 10% of the tests.
 
-That result is somewhat surprising since the search of the k-d tree is a log n process because the depth of a balanced tree is log2 n.  An argument for why this algorithm exhibits O(n) performance is this:
+That empirical result is somewhat surprising since the search of the k-d tree is a log n process because the depth of a balanced tree is log2 n.  An argument for why this algorithm exhibits O(n) performance is this:
 
 At the beginning when the k-d tree is still relatively full, each search requires log2(n) operations but the number of items returned with each search is likely large, probably larger than log2(n).  As the number of points in the tree reduces, the depth of the tree reduces.  So does the number of points returned from each search.  As long as the number of points returned from the search is linearly related to the depth of the tree, the performance will be linear.  And since there is no attempt to rebalance the k-d tree, the reduction in the depth of the tree happens locally and in the region of the cluster.
 
