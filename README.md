@@ -1,4 +1,4 @@
-# DBSCAN Clustering Implementation Using a Kd Tree
+# DBSCAN Clustering Implementation Using a K-d Tree
 
 The code included here implements the popular DBSCAN clustering algorithm [1] in Java.  This implementation uses a k-d tree to accelerate the process of building the clusters.  The k-d tree code is also presented here.  Using a k-d tree improves the performance of the clustering in two essential ways.
 
