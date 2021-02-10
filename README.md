@@ -2,9 +2,9 @@
 
 The code included here implements the popular DBSCAN clustering algorithm [1] in Java.  This implementation uses a k-d tree to accelerate the process of building the clusters.  The k-d tree code is also presented here.  Using a k-d tree improves the performance of the clustering in two essential ways.
 
-First, the k-d implementation is highly optimized to build and search the tree using multithreading, significantly reducing the time needed for window searches.
+First, the k-d tree code presented here is highly optimized to build and search the tree using multithreading, significantly reducing the time needed for window searches.
 
-Second, it supports removing cluster items from the k-d tree after the cluster items are added to a cluster.  Each cluster item is considered only once and does not have to be tagged as having been previously clustered.  In addition, as the k-d tree decreases in size, the searches speed up.
+Second, it supports removing cluster items from the k-d tree after the cluster items are added to a cluster.  Each clustered item is considered only once and does not have to be tagged as having been previously added to a cluster.  Also, as the k-d tree decreases in size, the searches speed up.
 
 ## Usage
 
@@ -19,52 +19,45 @@ In the example below that data is stored as a class in the Locations class.  The
 5. Call the build method with the build k-d tree and the search window
 6. Call the checkCluster function to get the statistics of the clustering
 
-Cluster objects are in the DBSCAN_clusers.clusters array list. Each cluster object contains an array of indices back to the Locations object. It also can contain bounds of that data
+Cluster objects are in the DBSCAN\_clusers.clusters array list. Each cluster object contains an array of indices back to the Locations object. It also can include bounds of that data.
 
 This source code example below can be found in the main function in DBSCANClusters.Java
-
 ```java
-(1.)
-long[] latLonTime = new long[3];
-KdTreeEx<Integer> fKdTree = new KdTreeEx<Integer>((int)locations.size(), 3);
-fKdTree.setNumThreads(Runtime.getRuntime().availableProcessors());
-(2.)
-for (int idx = 0;  idx < locations.size(); idx++){
-   // feed the kdTree
-   latLonTime[0] = locations.get(idx).getLatitudeE7();
+**(1.)**
+**long** [] latLonTime = **new long** [3];
+KdTreeEx\&lt;Integer\&gt; fKdTree = **new** KdTreeEx\&lt;Integer\&gt;(( **int** )locations.size(), 3);
+fKdTree.setNumThreads(Runtime._getRuntime_().availableProcessors());
+**(2.)**
+**for** ( **int** idx = 0;  idx \&lt; locations.size(); idx++){
+   _// feed the kdTree_
+_   _latLonTime[0] = locations.get(idx).getLatitudeE7();
    latLonTime[1] = locations.get(idx).getLongitudeE7();
    latLonTime[2] = locations.get(idx).getTimeStampLong();
-   if (0 > fKdTree.add(latLonTime, idx)) {
-       System.out.println("fKdTree data input error at " + idx);
+    **if** (0 \&gt; fKdTree.add(latLonTime, idx)) {
+       System. **out**.println( **&quot;fKdTree data input error at &quot;** + idx);
    }
 }
-long overallTime = System.currentTimeMillis();
-(3.)
+**long** overallTime = System._currentTimeMillis_();
+**(3.)**
 fKdTree.buildTree();
-
-(4.)
-// create a DBSCAN_Clusters object and override the getPoint fuction to get access to the location data.
-DBSCAN_Clusters visitCluster = new DBSCAN_Clusters(3);
-
-long clusterTime = System.currentTimeMillis();
-// get the search range to about cluster distance window
-long[] window = {searchRad, searchRad,searchRad};
-(5.)
-// step through every point to make sure it's been added to a cluster.
+**(4.)**
+DBSCAN\_Clusters visitCluster = **new** DBSCAN\_Clusters(3);
+**long** clusterTime = System._currentTimeMillis_();
+_// get the search range to about cluster distance window_
+**long** [] window = {searchRad, searchRad,searchRad};
+**(5.)**
+_// step through every point to make sure it&#39;s been added to a cluster._
 visitCluster.buildCluster(fKdTree, window);
-
-long currentTime =  System.currentTimeMillis();
-final double sC = (double) (currentTime - clusterTime) / 1000.;
-final double sO = (double) (currentTime - overallTime) / 1000;
-System.out.printf("Cluster time = %.3f\n", sC);
-System.out.printf("Overall time = %.3f\n", sO);
-(6.)
-if (!visitCluster.checkClusters((int)locations.size())) {
-   System.exit(1);
+**long** currentTime =  System._currentTimeMillis_();
+**final double** sC = ( **double** ) (currentTime - clusterTime) / 1000.;
+**final double** sO = ( **double** ) (currentTime - overallTime) / 1000;
+System. **out**.printf( **&quot;Cluster time = %.3f**** \n ****&quot;** , sC);
+System. **out**.printf( **&quot;Overall time = %.3f**** \n ****&quot;** , sO);
+**(6.)**
+**if** (!visitCluster.checkClusters(( **int** )locations.size())) {
+   System._exit_(1);
 }
 
-
-```
 ## Notes on Implementation
 
 The DBSCAN clustering algorithm  works as follows
@@ -79,36 +72,53 @@ The DBSCAN clustering algorithm  works as follows
 
 Using the k-d tree for the above algorithm helps in the following ways.
 
-1. Searching the data set that is contained in the k-d tree is very efficient.  The k-d tree includes a function that returns all points in the tree which is within a hypercube window which is multithreaded so handles large trees very well.
-2. There is a remove method that removes items from the k-d tree.  Other descriptions of DBSCAN algorithms such as [https://en.wikipedia.org/wiki/DBSCAN](https://en.wikipedia.org/wiki/DBSCAN) talk about tagging each item added to a cluster so that it can be ignored if it is returned in a future dataset search.  But by deleting the item from the k-d tree, that item will never show up in a future sort, so tagging is not necessary.
-3. The KdTreeEx class has a method that chooses an arbitrary item from the k-d tree and removes it from the tree at the same time.  This makes it easy to find the items to seed a new cluster within that it will only choose items that have not been deleted.
+1. Searching the data set that is contained in the k-d tree is very efficient.  The k-d tree includes a function that returns all points in the tree, which is within a hypercube window, which is multithreaded, so handles large trees very well.
+
+2. There is a remove method that removes items from the k-d tree.  Other descriptions of DBSCAN algorithms such as [https://en.wikipedia.org/wiki/DBSCAN](https://en.wikipedia.org/wiki/DBSCAN) talk about tagging each item added to a cluster so that it can be ignored if it is returned in a future dataset search.  But by deleting the item from the k-d tree, that item will never show up in a future search, so tagging is not necessary.
+3. The KdTreeEx class has a method that chooses an arbitrary item from the k-d tree and removes it from the tree at the same time.  This method makes it easy to find the items to seed a new cluster with, in that it will only choose items that have not been deleted.
+
 
 ### Differences fro Original Paper
 
-This implementation uses a hypercube search instead of a radial search to search for adjacent points to add to a cluster.  An additional search method could be added to the KdTree class to test against the radial distance from the center instead of being inside the hypercube.  Because of the sum of squares calculation required for a radial distance test, this choice of search kernel will be slower.  Of course, it depends on the particular needs.
+This implementation uses a hypercube search instead of a radial search to search for adjacent objects to add to a cluster.  An additional search method could be added to the KdTree class to test against the radial distance from the center instead of being inside the hypercube.  Because of the sum of squares calculation required for a radial distance test, this choice of search kernel will be slower.  Of course, it depends on the particular needs.
 
-Another difference is that this code does not explicitly implement the noise part of DBSCAN.  It would be easy to add a Min Cluster size parameter to buildClusters() method.  Or a &quot;noise&quot; tag could be added to each cluster by looping over the clusters in the DBSCAN\_Clusters.clusters list.  There is a sort() method that sorts clusters by size in the DBSCAN\_Cluster class which could aid in doing that tagging.
+Another difference is that this code does not explicitly implement the noise part of DBSCAN.  It would be easy to add a Min Cluster size parameter to buildClusters() method.  Or a &quot;noise&quot; tag could be added to each cluster by looping over the clusters in the DBSCAN\_Clusters.clusters list.  There is a sort() method that sorts clusters by size in the DBSCAN\_Cluster class, which could aid in doing that tagging.
 
 ## Performance
 
-The tests run on the simple dataset generated in main() show that removing data from the k-d tree as they are added to a cluster, results in a near-linear performance as a function of data points in the dataset.  Note that building the k-d tree is O(kn log n) but so the overall time can&#39;t exactly linear but the k-d tree build time is only about 10% of the tests.
+A comparison of the two charts below shows the increase in performance that can be attained by deleting items from the k-d tree using the simple test case coded in DBSCAN\_Clusters.main().  All times shown below include the k-d tree build.
 
-That empirical result is somewhat surprising since the search of the k-d tree is a log n process because the depth of a balanced tree is log2 n.  An argument for why this algorithm exhibits O(n) performance is this:
+The charts marked as Used Tagging Performance show the performance of an implementation where the k-d tree is searched to find the adjacent items in a cluster, but a record is kept to identify items that have been added to a cluster.  When the k-d tree search returns an item that has already been clustered, it is ignored.  This is a more typical implementation, and the code for that is not included in this repository.  Note the O(nlogn) grown law expected for this method.
 
-At the beginning when the k-d tree is still relatively full, each search requires log2(n) operations but the number of items returned with each search is likely large, probably larger than log2(n).  As the number of points in the tree reduces, the depth of the tree reduces.  So does the number of points returned from each search.  As long as the number of points returned from the search is linearly related to the depth of the tree, the performance will be linear.  And since there is no attempt to rebalance the k-d tree, the reduction in the depth of the tree happens locally and in the region of the cluster.
-
-| Clusters | Point per | Total Points | Seconds |
+| Cluters | Point per | Total Point | Seconds |
 | --- | --- | --- | --- |
-| 100 | 100 | 10000 | 0.3 |
-| 200 | 200 | 40000 | 0.861 |
-| 400 | 400 | 160000 | 2.382 |
-| 800 | 800 | 640000 | 8.181 |
-| 1600 | 1600 | 2560000 | 31.752 |
-| 2400 | 2400 | 5760000 | 72.082 |
-| 3200 | 3200 | 10240000 | 128.382 |
+| 100 | 100 | 10000 | 0.3468 |
+| 200 | 200 | 40000 | 1.156 |
+| 400 | 400 | 160000 | 1.5408 |
+| 800 | 800 | 640000 | 4.1802 |
+| 1600 | 1600 | 2560000 | 19.8892 |
+| 2400 | 2400 | 5760000 | 62.4002 |
+| 3200 | 3200 | 10240000 | 134.8298 |
 <img src="./DBSCANchart.svg">
 
-Of course, less evenly distributed data will probably show less linear growth but the deleting the items from the k-d tree will always help.
+Used Tagging Performance
+
+The charts marked Deleted Nodes Performace are for the implementation described above.  Not only does it show a 3 to 4x improvement in performance, but the performance improves with increasing points or items, and for the simple cases run here, it is sub-linear.
+
+| Cluters | Point per | Total Point | Seconds |
+| --- | --- | --- | --- |
+| 100 | 100 | 10000 | 0.1024 |
+| 200 | 200 | 40000 | 0.368 |
+| 400 | 400 | 160000 | 0.919 |
+| 800 | 800 | 640000 | 2.2598 |
+| 1600 | 1600 | 2560000 | 6.466 |
+| 2400 | 2400 | 5760000 | 18.14 |
+| 3200 | 3200 | 10240000 | 30.5544 |
+<img src="./DBSCANchart.svg">
+
+Deleted Node Performance
+
+Of course, less evenly distributed data will probably show less linear growth, but deleting the items from the k-d tree will always help.
 
 ## Notes on the KdTree Implementation
 
@@ -118,7 +128,10 @@ The code included here is an implementation of the algorithm described in [2] by
 
 1. Using two threads for the merge step of the merge sort algorithm, as well as for the partitioning step of the tree-building algorithm, wherein either step proceeds from both the start and end of an array concurrently.  These are straightforward ways to break up the work into multiple threads without a pre-operation to split up the work or a post-operation to recombine the results.
 
-1. A set of API methods added to the enclosing class to make easier to use by an application.
+1. A set of API methods added to the enclosing class to make it easier to use by an application.
+
+
+2. searchTree() method rewritten to be more efficient.
 
 1. The remove() method and pick() method.
 
