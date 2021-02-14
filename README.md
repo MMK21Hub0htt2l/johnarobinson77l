@@ -22,41 +22,48 @@ In the example below that data is stored as a class in the Locations class.  The
 Cluster objects are in the DBSCAN\_clusers.clusters array list. Each cluster object contains an array of indices back to the Locations object. It also can include bounds of that data.
 
 This source code example below can be found in the main function in DBSCANClusters.Java
+
 ```java
-**(1.)**
-**long** [] latLonTime = **new long** [3];
-KdTreeEx\&lt;Integer\&gt; fKdTree = **new** KdTreeEx\&lt;Integer\&gt;(( **int** )locations.size(), 3);
-fKdTree.setNumThreads(Runtime._getRuntime_().availableProcessors());
-**(2.)**
-**for** ( **int** idx = 0;  idx \&lt; locations.size(); idx++){
-   _// feed the kdTree_
-_   _latLonTime[0] = locations.get(idx).getLatitudeE7();
+(1.)
+long[] latLonTime = new long[3];
+KdTreeEx<Integer> fKdTree = new KdTreeEx<Integer>((int)locations.size(), 3);
+fKdTree.setNumThreads(Runtime.getRuntime().availableProcessors());
+(2.)
+for (int idx = 0;  idx < locations.size(); idx++){
+   // feed the kdTree
+   latLonTime[0] = locations.get(idx).getLatitudeE7();
    latLonTime[1] = locations.get(idx).getLongitudeE7();
    latLonTime[2] = locations.get(idx).getTimeStampLong();
-    **if** (0 \&gt; fKdTree.add(latLonTime, idx)) {
-       System. **out**.println( **&quot;fKdTree data input error at &quot;** + idx);
+   if (0 > fKdTree.add(latLonTime, idx)) {
+       System.out.println("fKdTree data input error at " + idx);
    }
 }
-**long** overallTime = System._currentTimeMillis_();
-**(3.)**
+long overallTime = System.currentTimeMillis();
+(3.)
 fKdTree.buildTree();
-**(4.)**
-DBSCAN\_Clusters visitCluster = **new** DBSCAN\_Clusters(3);
-**long** clusterTime = System._currentTimeMillis_();
-_// get the search range to about cluster distance window_
-**long** [] window = {searchRad, searchRad,searchRad};
-**(5.)**
-_// step through every point to make sure it&#39;s been added to a cluster._
+
+(4.)
+// create a DBSCAN_Clusters object.
+DBSCAN_Clusters visitCluster = new DBSCAN_Clusters(3);
+
+long clusterTime = System.currentTimeMillis();
+// get the search range to about cluster distance window
+long[] window = {searchRad, searchRad,searchRad};
+(5.)
+// step through every point to make sure it's been added to a cluster.
 visitCluster.buildCluster(fKdTree, window);
-**long** currentTime =  System._currentTimeMillis_();
-**final double** sC = ( **double** ) (currentTime - clusterTime) / 1000.;
-**final double** sO = ( **double** ) (currentTime - overallTime) / 1000;
-System. **out**.printf( **&quot;Cluster time = %.3f**** \n ****&quot;** , sC);
-System. **out**.printf( **&quot;Overall time = %.3f**** \n ****&quot;** , sO);
-**(6.)**
-**if** (!visitCluster.checkClusters(( **int** )locations.size())) {
-   System._exit_(1);
+
+long currentTime =  System.currentTimeMillis();
+final double sC = (double) (currentTime - clusterTime) / 1000.;
+final double sO = (double) (currentTime - overallTime) / 1000;
+System.out.printf("Cluster time = %.3f\n", sC);
+System.out.printf("Overall time = %.3f\n", sO);
+(6.)
+if (!visitCluster.checkClusters((int)locations.size())) {
+   System.exit(1);
 }
+
+```
 
 ## Notes on Implementation
 
@@ -99,9 +106,9 @@ The charts marked as Used Tagging Performance show the performance of an impleme
 | 1600 | 1600 | 2560000 | 19.8892 |
 | 2400 | 2400 | 5760000 | 62.4002 |
 | 3200 | 3200 | 10240000 | 134.8298 |
-<img src="./DBSCANchart.svg">
+<img src="./DBSCANchart1.svg">
 
-Used Tagging Performance
+#### Figure 1. Used Tagging Performance
 
 The charts marked Deleted Nodes Performace are for the implementation described above.  Not only does it show a 3 to 4x improvement in performance, but the performance improves with increasing points or items, and for the simple cases run here, it is sub-linear.
 
@@ -114,9 +121,9 @@ The charts marked Deleted Nodes Performace are for the implementation described 
 | 1600 | 1600 | 2560000 | 6.466 |
 | 2400 | 2400 | 5760000 | 18.14 |
 | 3200 | 3200 | 10240000 | 30.5544 |
-<img src="./DBSCANchart.svg">
+<img src="./DBSCANchart2.svg">
 
-Deleted Node Performance
+#### Figure 2. Deleted Node Performance
 
 Of course, less evenly distributed data will probably show less linear growth, but deleting the items from the k-d tree will always help.
 
@@ -129,7 +136,6 @@ The code included here is an implementation of the algorithm described in [2] by
 1. Using two threads for the merge step of the merge sort algorithm, as well as for the partitioning step of the tree-building algorithm, wherein either step proceeds from both the start and end of an array concurrently.  These are straightforward ways to break up the work into multiple threads without a pre-operation to split up the work or a post-operation to recombine the results.
 
 1. A set of API methods added to the enclosing class to make it easier to use by an application.
-
 
 2. searchTree() method rewritten to be more efficient.
 
