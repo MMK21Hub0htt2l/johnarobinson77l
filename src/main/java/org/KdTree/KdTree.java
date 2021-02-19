@@ -30,6 +30,7 @@ package org.KdTree;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -62,10 +63,10 @@ public class KdTree<VALUE_TYPE> {
      * </p>
      */
     static class KdNode<VALUE_TYPE> {
-		
+
         private static final int INSERTION_SORT_CUTOFF = 15;
 
-        // Change to whatever value type desired; NOTE that a List requires a lot of memory.		
+        // Change to whatever value type desired; NOTE that a List requires a lot of memory.
         List<VALUE_TYPE> value;
         long[] tuple;
         KdNode ltChild, gtChild;
@@ -87,7 +88,7 @@ public class KdTree<VALUE_TYPE> {
          * <p>
          * The {@code initializeReference} method initializes one reference array.
          * </p>
-         * 
+         *
          * @param coordinates - a KdNode[]
          * @param reference - a KdNode[]
          */
@@ -101,31 +102,31 @@ public class KdTree<VALUE_TYPE> {
         /**
          * <p>
          * The {@code initializeReferenceWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#initializeReference initializeReference} method.
          * </p>
-         * 
+         *
          * @param coordinates - a KdNode[]
          * @param reference - a KdNode[]
          */
         private static Callable<Void> initializeReferenceWithThread(final KdNode[] coordinates,
                                                                     final KdNode[] reference) {
-            
+
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     initializeReference(coordinates, reference);
                     return null;
                 }
             };
         }
-        
+
         /**
          * <p>
          * The {@code superKeyCompare} method compares two int[] in as few coordinates as possible
          * and uses the sorting or partition coordinate as the most significant coordinate.
          * </p>
-         * 
+         *
          * @param a - a int[]
          * @param b - a int[]
          * @param p - the most significant dimension
@@ -146,7 +147,7 @@ public class KdTree<VALUE_TYPE> {
          * <p> The {@code mergeResultsAscending} method compares the results in the source array in order of
          * ascending address and merges them into the destination array in order of ascending value.
          * </p>
-         * 
+         *
          * @param destination - a KdNode[] from which to merge results
          * @param source - a KdNode[] into which to merge results
          * @param iStart - the initial value of the i-index
@@ -158,7 +159,7 @@ public class KdTree<VALUE_TYPE> {
         private static void mergeResultsAscending(final KdNode[] destination, final KdNode[] source,
                                                   final int iStart, final int jStart, final int kStart,
                                                   final int kEnd, final int p) {
-			
+
             for (int i = iStart, j = jStart, k = kStart; k <= kEnd; k++) {
                 destination[k] = (superKeyCompare(source[i].tuple, source[j].tuple, p) <= 0) ? source[i++] : source[j--];
             }
@@ -168,7 +169,7 @@ public class KdTree<VALUE_TYPE> {
          * <p> The {@code mergeResultsDescending} method compares the results in the source array in order of
          * ascending address and merges them into the destination array in order of descending value.
          * </p>
-         * 
+         *
          * @param destination - a KdNode[] from which to merge results
          * @param source - a KdNode[] into which to merge results
          * @param iStart - the initial value of the i-index
@@ -180,7 +181,7 @@ public class KdTree<VALUE_TYPE> {
         private static void mergeResultsDescending(final KdNode[] destination, final KdNode[] source,
                                                    final int iStart, final int jStart, final int kStart,
                                                    final int kEnd, final int p) {
-			
+
             for (int i = iStart, j = jStart, k = kStart; k <= kEnd; k++) {
                 destination[k] = (superKeyCompare(source[i].tuple, source[j].tuple, p) >= 0) ? source[i++] : source[j--];
             }
@@ -189,10 +190,10 @@ public class KdTree<VALUE_TYPE> {
         /**
          * <p>
          * The {@code mergeResultsAscendingWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#mergeResultsAscending mergeResultsAscending} method.
          * </p>
-         * 
+         *
          * @param destination - a KdNode[] from which to merge results
          * @param source - a KdNode[] into which to merge results
          * @param iStart - the initial value of the i-index
@@ -204,10 +205,10 @@ public class KdTree<VALUE_TYPE> {
         private static Callable<Void> mergeResultsAscendingWithThread(final KdNode[] destination, final KdNode[] source,
                                                                       final int iStart, final int jStart, final int kStart,
                                                                       final int kEnd, final int p) {
-            
+
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     mergeResultsAscending(destination, source, iStart, jStart, kStart, kEnd, p);
                     return null;
                 }
@@ -217,10 +218,10 @@ public class KdTree<VALUE_TYPE> {
         /**
          * <p>
          * The {@code mergeResultsDescendingWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#mergeResultsDescending mergeResultsDescending} method.
          * </p>
-         * 
+         *
          * @param destination - a KdNode[] from which to merge results
          * @param source - a KdNode[] into which to merge results
          * @param iStart - the initial value of the i-index
@@ -232,10 +233,10 @@ public class KdTree<VALUE_TYPE> {
         private static Callable<Void> mergeResultsDescendingWithThread(final KdNode[] destination, final KdNode[] source,
                                                                        final int iStart, final int jStart, final int kStart,
                                                                        final int kEnd, final int p) {
-            
+
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     mergeResultsDescending(destination, source, iStart, jStart, kStart, kEnd, p);
                     return null;
                 }
@@ -263,7 +264,7 @@ public class KdTree<VALUE_TYPE> {
          * merge sort and by applying some "recursive trickery" to arrange that the required result is
          * returned in the auxiliary array by one version and in the result array by the other version.
          * The following four merge sort methods build upon this suggestion and return their result in
-         * either ascending or descending (inverted) order.  
+         * either ascending or descending (inverted) order.
          * </p>
          * <p>
          * During multi-threaded execution, the upper and lower halves of the result array may be filled
@@ -277,13 +278,13 @@ public class KdTree<VALUE_TYPE> {
          * of the result array, there is no requirement to test for exhaustion provided that upper half of
          * the result array never comprises more elements than the lower half of the result array.  This
          * provision is satisfied by computing the median address of the result array as shown below for
-         * all four merge sort methods. 
+         * all four merge sort methods.
          * </p>
          * <p>
          * The {@code mergeSortReferenceAscending} method recursively subdivides the array to be sorted
          * then merges the elements in ascending order and leaves the result in the reference array.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch KdNode[] from which to copy results;
          *                    this array must be as large as the reference array
@@ -322,16 +323,16 @@ public class KdTree<VALUE_TYPE> {
                     // the reference array in ascending order.
                     for (int i = low, j = high, k = low; k <= high; k++) {
                         reference[k] =
-                            (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) < 0) ? temporary[i++] : temporary[j--];
+                                (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) < 0) ? temporary[i++] : temporary[j--];
                     }
-	                
+
                 } else {
 
                     // Yes, a child thread is available, so recursively subdivide the lower half of the reference
                     // array with a child thread and return the result in the temporary array in ascending order.
                     final Future<Void> sortFuture =
-                        executor.submit( mergeSortTemporaryAscendingWithThread(reference, temporary,
-                                                                               low, mid, p, executor, maximumSubmitDepth, depth + 1) );
+                            executor.submit( mergeSortTemporaryAscendingWithThread(reference, temporary,
+                                    low, mid, p, executor, maximumSubmitDepth, depth + 1) );
 
                     // And simultaneously, recursively subdivide the upper half of the reference array with
                     // the current thread and return the result in the temporary array in descending order.
@@ -343,17 +344,17 @@ public class KdTree<VALUE_TYPE> {
                     } catch (Exception e) {
                         throw new RuntimeException( "sort future exception: " + e.getMessage() );
                     }
-					
+
                     // Compare the results in the temporary array in ascending order with a child thread
                     // and merge them into the lower half of the reference array in ascending order.
                     final Future<Void> mergeFuture =
-                        executor.submit( mergeResultsAscendingWithThread(reference, temporary, low, high, low, mid, p) );
+                            executor.submit( mergeResultsAscendingWithThread(reference, temporary, low, high, low, mid, p) );
 
                     // And simultaneously compare the results in the temporary array in descending order with the
                     // current thread and merge them into the upper half of the reference array in ascending order.
                     for (int i = mid, j = mid + 1, k = high; k > mid; k--) {
                         reference[k] =
-                            (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) > 0) ? temporary[i--] : temporary[j++];
+                                (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) > 0) ? temporary[i--] : temporary[j++];
                     }
 
                     // Then get the result of merging into the lower half of the reference array with the child thread.
@@ -365,7 +366,7 @@ public class KdTree<VALUE_TYPE> {
                 }
 
             } else {
-				
+
                 // Here is Jon Benley's implementation of insertion sort from "Programming Pearls", pp. 115-116,
                 // Addison-Wesley, 1999, that sorts in ascending order and leaves the result in the reference array.
                 for (int i = low + 1; i <= high; i++) {
@@ -378,13 +379,13 @@ public class KdTree<VALUE_TYPE> {
                 }
             }
         }
-		
+
         /**
          * <p>
          * The {@code mergeSortReferenceDescending} method recursively subdivides the array to be sorted
          * then merges the elements in descending order and leaves the result in the reference array.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch KdNode[] from which to copy results;
          *                    this array must be as large as the reference array
@@ -423,16 +424,16 @@ public class KdTree<VALUE_TYPE> {
                     // the reference array in descending order.
                     for (int i = low, j = high, k = low; k <= high; k++) {
                         reference[k] =
-                            (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) > 0) ? temporary[i++] : temporary[j--];
+                                (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) > 0) ? temporary[i++] : temporary[j--];
                     }
-	                
+
                 } else {
 
                     // Yes, a child thread is available, so recursively subdivide the lower half of the reference
                     // array with a child thread and return the result in the temporary array in descending order.
                     final Future<Void> sortFuture =
-                        executor.submit( mergeSortTemporaryDescendingWithThread(reference, temporary,
-                                                                                low, mid, p, executor, maximumSubmitDepth, depth + 1) );
+                            executor.submit( mergeSortTemporaryDescendingWithThread(reference, temporary,
+                                    low, mid, p, executor, maximumSubmitDepth, depth + 1) );
 
                     // And simultaneously, recursively subdivide the upper half of the reference array with
                     // the current thread and return the result in the temporary array in ascending order.
@@ -448,13 +449,13 @@ public class KdTree<VALUE_TYPE> {
                     // Compare the results in the temporary array in ascending order with a child thread
                     // and merge them into the lower half of the reference array in descending order.
                     final Future<Void> mergeFuture =
-                        executor.submit( mergeResultsDescendingWithThread(reference, temporary, low, high, low, mid, p) );
+                            executor.submit( mergeResultsDescendingWithThread(reference, temporary, low, high, low, mid, p) );
 
                     // And simultaneously compare the results in the temporary array in descending order with the
                     // current thread and merge them into the upper half of the reference array in descending order.
                     for (int i = mid, j = mid + 1, k = high; k > mid; k--) {
                         reference[k] =
-                            (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) < 0) ? temporary[i--] : temporary[j++];
+                                (superKeyCompare(temporary[i].tuple, temporary[j].tuple, p) < 0) ? temporary[i--] : temporary[j++];
                     }
 
                     // Then get the result of merging into the lower half of the reference array with the child thread.
@@ -466,7 +467,7 @@ public class KdTree<VALUE_TYPE> {
                 }
 
             } else {
-				
+
                 // Here is Jon Benley's implementation of insertion sort from "Programming Pearls", pp. 115-116,
                 // Addison-Wesley, 1999, that sorts in descending order and leaves the result in the reference array.
                 for (int i = low + 1; i <= high; i++) {
@@ -485,7 +486,7 @@ public class KdTree<VALUE_TYPE> {
          * The {@code mergeSortTemporaryAscending} method recursively subdivides the array to be sorted
          * then merges the elements in ascending order and leaves the result in the temporary array.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch KdNode[] into which to copy results;
          *                    this array must be as large as the reference array
@@ -524,17 +525,17 @@ public class KdTree<VALUE_TYPE> {
                     // the temporary array in ascending order.
                     for (int i = low, j = high, k = low; k <= high; k++) {
                         temporary[k] =
-                            (superKeyCompare(reference[i].tuple, reference[j].tuple, p) < 0) ? reference[i++] : reference[j--];
+                                (superKeyCompare(reference[i].tuple, reference[j].tuple, p) < 0) ? reference[i++] : reference[j--];
                     }
 
-				
+
                 } else {
 
                     // Yes, a child thread is available, so recursively subdivide the lower half of the reference
                     // array with a child thread and return the result in the reference array in ascending order.
                     final Future<Void> sortFuture =
-                        executor.submit( mergeSortReferenceAscendingWithThread(reference, temporary,
-                                                                               low, mid, p, executor, maximumSubmitDepth, depth + 1) );
+                            executor.submit( mergeSortReferenceAscendingWithThread(reference, temporary,
+                                    low, mid, p, executor, maximumSubmitDepth, depth + 1) );
 
                     // And simultaneously, recursively subdivide the upper half of the reference array with
                     // the current thread and return the result in the reference array in descending order.
@@ -550,13 +551,13 @@ public class KdTree<VALUE_TYPE> {
                     // Compare the results in the reference array in ascending order with a child thread
                     // and merge them into the lower half of the temporary array in ascending order.
                     final Future<Void> mergeFuture =
-                        executor.submit( mergeResultsAscendingWithThread(temporary, reference, low, high, low, mid, p) );
+                            executor.submit( mergeResultsAscendingWithThread(temporary, reference, low, high, low, mid, p) );
 
                     // And simultaneously compare the results in the reference array in descending order with the
                     // current thread and merge them into the upper half of the temporary array in ascending order.
                     for (int i = mid, j = mid + 1, k = high; k > mid; k--) {
                         temporary[k] =
-                            (superKeyCompare(reference[i].tuple, reference[j].tuple, p) > 0) ? reference[i--] : reference[j++];
+                                (superKeyCompare(reference[i].tuple, reference[j].tuple, p) > 0) ? reference[i--] : reference[j++];
                     }
 
                     // Then get the result of merging into the lower half of the temporary array with the child thread.
@@ -568,7 +569,7 @@ public class KdTree<VALUE_TYPE> {
                 }
 
             } else {
-				
+
                 // This implementation of insertion sort leaves the result in the temporary array in ascending order.
                 temporary[high] = reference[high];
                 int i, j;
@@ -584,13 +585,13 @@ public class KdTree<VALUE_TYPE> {
                 }
             }
         }
-		
+
         /**
          * <p>
          * The {@code mergeSortTemporaryDescending} method recursively subdivides the array to be sorted
          * then merges the elements in descending order and leaves the result in the temporary array.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch array into which to copy results;
          *                    this array must be as large as the reference array
@@ -629,17 +630,17 @@ public class KdTree<VALUE_TYPE> {
                     // the temporary array in descending order.
                     for (int i = low, j = high, k = low; k <= high; k++) {
                         temporary[k] =
-                            (superKeyCompare(reference[i].tuple, reference[j].tuple, p) > 0) ? reference[i++] : reference[j--];
+                                (superKeyCompare(reference[i].tuple, reference[j].tuple, p) > 0) ? reference[i++] : reference[j--];
                     }
 
-					
+
                 } else {
 
                     // Yes, a child thread is available, so recursively subdivide the lower half of the reference
                     // array with a child thread and return the result in the reference array in descending order.
                     final Future<Void> sortFuture =
-                        executor.submit( mergeSortReferenceDescendingWithThread(reference, temporary,
-                                                                                low, mid, p, executor, maximumSubmitDepth, depth + 1) );
+                            executor.submit( mergeSortReferenceDescendingWithThread(reference, temporary,
+                                    low, mid, p, executor, maximumSubmitDepth, depth + 1) );
 
                     // And simultaneously, recursively subdivide the upper half of the reference array with
                     // the current thread and return the result in the reference array in ascending order.
@@ -655,13 +656,13 @@ public class KdTree<VALUE_TYPE> {
                     // Compare the results in the reference array in ascending order with a child thread
                     // and merge them into the lower half of the temporary array in descending order.
                     final Future<Void> mergeFuture =
-                        executor.submit( mergeResultsDescendingWithThread(temporary, reference, low, high, low, mid, p) );
+                            executor.submit( mergeResultsDescendingWithThread(temporary, reference, low, high, low, mid, p) );
 
                     // And simultaneously compare the results in the reference array in descending order with the
                     // current thread and merge them into the upper half of the temporary array in descending order.
                     for (int i = mid, j = mid + 1, k = high; k > mid; k--) {
                         temporary[k] =
-                            (superKeyCompare(reference[i].tuple, reference[j].tuple, p) < 0) ? reference[i--] : reference[j++];
+                                (superKeyCompare(reference[i].tuple, reference[j].tuple, p) < 0) ? reference[i--] : reference[j++];
                     }
 
                     // Then get the result of merging into the lower half of the temporary array with the child thread.
@@ -673,7 +674,7 @@ public class KdTree<VALUE_TYPE> {
                 }
 
             } else {
-				
+
                 // This implementation of insertion sort leaves the result in the temporary array in descending order.
                 temporary[high] = reference[high];
                 int i, j;
@@ -689,14 +690,14 @@ public class KdTree<VALUE_TYPE> {
                 }
             }
         }
-		
+
         /**
          * <p>
          * The {@code mergeSortReferenceAscendingWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#mergeSortReferenceAscending mergeSortReferenceAscending} method.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch KdNode[] from which to copy results;
          *                    this array must be as large as the reference array.
@@ -711,10 +712,10 @@ public class KdTree<VALUE_TYPE> {
                                                                             final int low, final int high, final int p,
                                                                             final ExecutorService executor,
                                                                             final int maximumSubmitDepth, final int depth) {
-            
+
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     mergeSortReferenceAscending(reference, temporary, low, high, p, executor, maximumSubmitDepth, depth);
                     return null;
                 }
@@ -724,10 +725,10 @@ public class KdTree<VALUE_TYPE> {
         /**
          * <p>
          * The {@code mergeSortReferenceDescendingWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#mergeSortReferenceDescending mergeSortReferenceDescending} method.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch KdNode[] from which to copy results;
          *                    this array must be as large as the reference array.
@@ -742,10 +743,10 @@ public class KdTree<VALUE_TYPE> {
                                                                              final int low, final int high, final int p,
                                                                              final ExecutorService executor,
                                                                              final int maximumSubmitDepth, final int depth) {
-            
+
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     mergeSortReferenceDescending(reference, temporary, low, high, p, executor, maximumSubmitDepth, depth);
                     return null;
                 }
@@ -755,10 +756,10 @@ public class KdTree<VALUE_TYPE> {
         /**
          * <p>
          * The {@code mergeSortTemporaryAscendingWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#mergeSortTemporaryAscending mergeSortTemporaryAscending} method.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch KdNode[] into which to copy results;
          *                    this array must be as large as the reference array.
@@ -773,10 +774,10 @@ public class KdTree<VALUE_TYPE> {
                                                                             final int low, final int high, final int p,
                                                                             final ExecutorService executor,
                                                                             final int maximumSubmitDepth, final int depth) {
-            
+
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     mergeSortTemporaryAscending(reference, temporary, low, high, p, executor, maximumSubmitDepth, depth);
                     return null;
                 }
@@ -786,10 +787,10 @@ public class KdTree<VALUE_TYPE> {
         /**
          * <p>
          * The {@code mergeSortTemporaryDescendingWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#mergeSortTemporaryDescending mergeSortTemporaryDescending} method.
          * </p>
-         * 
+         *
          * @param reference - a KdNode[]
          * @param temporary - a scratch KdNode[] into which to copy results;
          *                    this array must be as large as the reference array.
@@ -804,10 +805,10 @@ public class KdTree<VALUE_TYPE> {
                                                                              final int low, final int high, final int p,
                                                                              final ExecutorService executor,
                                                                              final int maximumSubmitDepth, final int depth) {
-            
+
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     mergeSortTemporaryDescending(reference, temporary, low, high, p, executor, maximumSubmitDepth, depth);
                     return null;
                 }
@@ -879,30 +880,30 @@ public class KdTree<VALUE_TYPE> {
                 node = references[0][start];
 
             } else if (end == start + 1) {
-				
+
                 // Two references were passed to this method in sorted order, so store the start
-                // element at this level of the tree and store the end element as the > child. 
+                // element at this level of the tree and store the end element as the > child.
                 node = references[0][start];
                 node.gtChild = references[0][end];
-				
+
             } else if (end == start + 2) {
-				
+
                 // Three references were passed to this method in sorted order, so
                 // store the median element at this level of the tree, store the start
                 // element as the < child and store the end element as the > child.
                 node = references[0][start + 1];
                 node.ltChild = references[0][start];
                 node.gtChild = references[0][end];
-				
+
             } else if (end > start + 2) {
-				
+
                 // Four or more references were passed to this method.  Partitioning of the other reference
                 // arrays will occur about the median element of references[0].  Avoid overflow when
                 // calculating the median.  Store the median element of references[0] in a new k-d node.
                 int median = start + ((end - start) >> 1);
                 if (median <= start || median >= end) {
                     throw new RuntimeException("error in median calculation at depth = " + depth +
-                                               " : start = " + start + "  median = " + median + "  end = " + end);
+                            " : start = " + start + "  median = " + median + "  end = " + end);
                 }
                 node = references[0][median];
 
@@ -917,27 +918,27 @@ public class KdTree<VALUE_TYPE> {
                 // permuting the reference arrays.  Skip the element of references[i] that
                 // references a point that equals the point that is stored in the new k-d node.
                 for (int i = 1; i < references.length; i++) {
-                    
+
                     // Is a child thread available to partition the lower half of one reference array?
                     if (maximumSubmitDepth < 0 || depth > maximumSubmitDepth) {
-                        
+
                         // No, so partiion the lower half of the reference array with the current thread.
                         scanAndPartitionLower(references, node, p, i, start, median);
-                    
+
                         // Then partition the upper half of the reference array with the current thread.
                         scanAndPartitionUpper(references, node, p, i, median, end);
-                        
+
                     } else {
-                        
+
                         // Yes, a child thread is available, so partition the lower half
                         // of the reference array with a child thread.
                         final Future<Void> future =
-                            executor.submit( scanAndPartitionLowerWithThread(references, node, p, i,
-                                                                             start, median) );
+                                executor.submit( scanAndPartitionLowerWithThread(references, node, p, i,
+                                        start, median) );
                         // And simultaneously partition the upper half of the reference
                         // array with the current thread.
                         scanAndPartitionUpper(references, node, p, i, median, end);
-                        
+
                         // Then get the result of partitioning the lower half
                         // of the references array with the child thread.
                         try {
@@ -968,24 +969,24 @@ public class KdTree<VALUE_TYPE> {
 
                     // No, so recursively build the < branch of the tree with the current thread.
                     node.ltChild = buildKdTree(references, temporary, permutation,
-                                               start, median - 1, executor, maximumSubmitDepth, depth + 1);
+                            start, median - 1, executor, maximumSubmitDepth, depth + 1);
 
                     // Then recursively build the > branch of the tree with the current thread.
                     node.gtChild = buildKdTree(references, temporary, permutation,
-                                               median + 1, end, executor, maximumSubmitDepth, depth + 1);
-					
+                            median + 1, end, executor, maximumSubmitDepth, depth + 1);
+
                 } else {
-					
+
                     // Yes, a child thread is available, so recursively build the < branch with a child thread.
                     final Future<KdNode> future =
-                        executor.submit( buildKdTreeWithThread(references, temporary, permutation,
-                                                               start, median - 1, executor, maximumSubmitDepth,
-                                                               depth + 1) );
-					
+                            executor.submit( buildKdTreeWithThread(references, temporary, permutation,
+                                    start, median - 1, executor, maximumSubmitDepth,
+                                    depth + 1) );
+
                     // And simultaneously, recursively build the > branch of the tree with the current thread.
                     node.gtChild = buildKdTree(references, temporary, permutation,
-                                               median + 1, end, executor, maximumSubmitDepth, depth + 1);
-					
+                            median + 1, end, executor, maximumSubmitDepth, depth + 1);
+
                     // Then get the result of building the < branch with the child thread.
                     try {
                         node.ltChild = future.get();
@@ -993,27 +994,27 @@ public class KdTree<VALUE_TYPE> {
                         throw new RuntimeException( "recursive future exception: " + e.getMessage() );
                     }
                 }
-				
+
             } else 	if (end < start) {
-				
+
                 // This is an illegal condition that should never occur, so test for it last.
                 throw new RuntimeException("end < start");
-				
+
             } else {
-				
+
                 // This final else block is added to keep the Java compiler from complaining.
                 throw new RuntimeException("unknown configuration of  start and end");
             }
-			
+
             return node;
         }
-        
+
         /**
          * <p>
          * Return a {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#buildKdTree buildKdTree} method.
          * </p>
-         * 
+         *
          * @param references - multiple arrays of KdNode[]
          * @param temporary - a scratch KdNode[] for use in partitioning
          * @param permutation - an array that indicates permutation of the reference arrays
@@ -1028,12 +1029,12 @@ public class KdTree<VALUE_TYPE> {
                                                               final int[] permutation, final int start, final int end,
                                                               final ExecutorService executor,
                                                               final int maximumSubmitDepth, final int depth) {
-			
+
             return new Callable<KdNode>() {
                 @Override
-                    public KdNode call() {
+                public KdNode call() {
                     return buildKdTree(references, temporary, permutation,
-                                       start, end, executor, maximumSubmitDepth, depth);
+                            start, end, executor, maximumSubmitDepth, depth);
                 }
             };
         }
@@ -1063,7 +1064,7 @@ public class KdTree<VALUE_TYPE> {
                 }
             }
         }
-        
+
         /**
          * <p>
          * Return a {@link java.util.concurrent.Callable Callable} whose call() method executes the
@@ -1083,13 +1084,13 @@ public class KdTree<VALUE_TYPE> {
                                                                       final int start, final int median) {
             return new Callable<Void>() {
                 @Override
-                    public Void call() {
+                public Void call() {
                     scanAndPartitionLower(references, node, p, i, start, median);
                     return null;
                 }
             };
         }
-        
+
         /**
          * <p>
          * Scan and partition the upper half of a reference array.
@@ -1115,13 +1116,13 @@ public class KdTree<VALUE_TYPE> {
                 }
             }
         }
-        
+
         /**
          * <p>
          * The {@code verifyKdTree} method checks that the children of each node of the k-d tree
          * are correctly sorted relative to that node.
          * </p>
-         * 
+         *
          * @param permutation - an array that indicates permutation of the reference arrays
          * @param executor - a {@link java.util.concurrent.ExecutorService ExecutorService}
          * @param maximumSubmitDepth - the maximum tree depth at which a thread may be launched
@@ -1154,7 +1155,7 @@ public class KdTree<VALUE_TYPE> {
                     throw new RuntimeException("node is <= partition!");
                 }
             }
-			
+
             // Count this node.
             int count = 1 ;
 
@@ -1179,9 +1180,9 @@ public class KdTree<VALUE_TYPE> {
                 Future<Integer> future = null;
                 if (ltChild != null) {
                     future = executor.submit( ltChild.verifyKdTreeWithThread(permutation, executor,
-                                                                             maximumSubmitDepth, depth + 1) );
+                            maximumSubmitDepth, depth + 1) );
                 }
-            
+
                 // And simultaneously search the > branch with the current thread.
                 if (gtChild != null) {
                     count += gtChild.verifyKdTree(permutation, executor, maximumSubmitDepth, depth + 1);
@@ -1203,10 +1204,10 @@ public class KdTree<VALUE_TYPE> {
         /**
          * <p>
          * The {@code verifyKdTreeWithThread} method returns a
-         * {@link java.util.concurrent.Callable Callable} whose call() method executes the 
+         * {@link java.util.concurrent.Callable Callable} whose call() method executes the
          * {@link KdNode#verifyKdTree verifyKdTree} method.
          * </p>
-         * 
+         *
          * @param permutation - an array that indicates permutation of the reference arrays
          * @param executor - a {@link java.util.concurrent.ExecutorService ExecutorService}
          * @param maximumSubmitDepth - the maximum tree depth at which a thread may be launched
@@ -1215,10 +1216,10 @@ public class KdTree<VALUE_TYPE> {
          */
         private Callable<Integer> verifyKdTreeWithThread(final int[] permutation, final ExecutorService executor,
                                                          final int maximumSubmitDepth, final int depth) {
-			
+
             return new Callable<Integer>() {
                 @Override
-                    public Integer call() {
+                public Integer call() {
                     return verifyKdTree(permutation, executor, maximumSubmitDepth, depth);
                 }
             };
@@ -1238,13 +1239,13 @@ public class KdTree<VALUE_TYPE> {
             a[i] = a[j];
             a[j] = t;
         }
-        
+
         /**
          * <p>
          * The {@code createKdTree} method builds a k-d tree from a KdNode[]
          * where the coordinates of each point are stored in KdNode.tuple
          * </p>
-         *  
+         *
          * @param coordinates - a KdNode[]
          * @param permutation - an array that indicates permutation of the reference arrays
          * @param executor - a {@link java.util.concurrent.ExecutorService ExecutorService}
@@ -1253,7 +1254,7 @@ public class KdTree<VALUE_TYPE> {
          */
         public static KdNode createKdTree(KdNode[] coordinates, final int numPoints, final int[] permutation,
                                           final ExecutorService executor, final int maximumSubmitDepth) {
-			
+
             // Declare all reference arrays and initialize one of them. The number of dimensions
             // may be obtained from either coordinates[0].length or references.length.  The number
             // of points may be obtained from either coordinates.length or references[0].length.
@@ -1270,7 +1271,7 @@ public class KdTree<VALUE_TYPE> {
             long sortTime;
             if (KdTree.printstats) sortTime = System.currentTimeMillis();
             mergeSortReferenceAscending(references[0], temporary, 0, numPoints - 1,
-                                        key, executor, maximumSubmitDepth, 0);
+                    key, executor, maximumSubmitDepth, 0);
             if (KdTree.printstats) sortTime = System.currentTimeMillis() - sortTime;
 
             // Remove references to duplicate tuples via one pass through the sorted reference array.
@@ -1290,7 +1291,7 @@ public class KdTree<VALUE_TYPE> {
                     initializeReference(references[0], references[i]);
                 } else {
                     Future<Void> future =
-                        executor.submit( initializeReferenceWithThread(references[0], references[i]) );
+                            executor.submit( initializeReferenceWithThread(references[0], references[i]) );
                     initializeFutures.add(future);
                 }
             }
@@ -1302,7 +1303,7 @@ public class KdTree<VALUE_TYPE> {
                 }
             }
             if (KdTree.printstats) initTime += System.currentTimeMillis() - initTime2;
-			
+
             // Sort the other reference arrays but sort only the de-duplicated region
             // of those reference arrays. Use the remaining dimensions (not 0 that
             // was used for sorting above) for sorting the other reference arrays such
@@ -1315,7 +1316,7 @@ public class KdTree<VALUE_TYPE> {
             if (KdTree.printstats) sortTime2 = System.currentTimeMillis();
             for (int i = 1; i < references.length; i++) {
                 mergeSortReferenceAscending(references[i], temporary, 0, end,
-                                            i, executor, maximumSubmitDepth, 0);
+                        i, executor, maximumSubmitDepth, 0);
             }
             if (KdTree.printstats) sortTime += System.currentTimeMillis() - sortTime2;
 
@@ -1323,9 +1324,9 @@ public class KdTree<VALUE_TYPE> {
             long kdTime;
             if (KdTree.printstats) kdTime = System.currentTimeMillis();
             final KdNode root = buildKdTree(references, temporary, permutation, 0,
-                                            end, executor, maximumSubmitDepth, 0);
+                    end, executor, maximumSubmitDepth, 0);
             if (KdTree.printstats) kdTime = System.currentTimeMillis() - kdTime;
-			
+
             // Verify the k-d tree via hierarchical multi-threading if possible and report the number of nodes.
             long verifyTime;
             if (KdTree.printstats) verifyTime = System.currentTimeMillis();
@@ -1344,7 +1345,7 @@ public class KdTree<VALUE_TYPE> {
                                 + "  removeTime = %.2f  kdTime = %.2f  verifyTime = %.2f\n\n",
                         iT + sT + rT + kT + vT, iT, sT, rT, kT, vT);
             }
-			
+
             // Return the root of the tree.
             return root;
         }
@@ -1460,14 +1461,19 @@ public class KdTree<VALUE_TYPE> {
             };
         }
 
-       /**
+        /**
          * <p>
          * The {@code searchKdTree} method searches the k-d tree and finds the KdNodes
          * that lie within a cutoff distance from a query node in all k dimensions.
          * </p>
          *
-         * @param result - ArrayList to which the values of k-d nodes that lie within the cutoff
-         *               distance of the query node will be added.
+         /**
+         * <p>
+         * The {@code searchKdTree} method searches the k-d tree and finds the KdNodes
+         * that lie within a cutoff distance from a query node in all k dimensions.
+         * </p>
+         *
+         * @param result - ArrayList to the k-d nodes that lie the query hypercube will be added.
          * @param queryPlus - Array containing the lager search bound for each dimension
          * @param queryMinus - Array containing the smaller search bound for each dimension
          * @param permutation - an array that indicates permutation of the reference arrays
@@ -1476,76 +1482,92 @@ public class KdTree<VALUE_TYPE> {
          * @param depth - the depth in the k-d tree
          * @return void
          */
-       void searchKdTree(final List<VALUE_TYPE> result, final long[] queryPlus, final long[] queryMinus,
-                         final int[] permutation, final ExecutorService executor,
-                         final int maximumSubmitDepth, final int depth) {
+        void searchKdTree(final ArrayList<KdNode<VALUE_TYPE>> result, final long[] queryPlus, final long[] queryMinus,
+                          final int[] permutation, final ExecutorService executor,
+                          final int maximumSubmitDepth, final int depth) {
 
             // Look up the partition.
             final int p = permutation[depth];
-            // get a list ready for the other thread to use
-            List<VALUE_TYPE> threadList = null;
 
-            // If the distance from the query node to the k-d node is within the cutoff distance
-            // in all k dimensions, add the k-d node to a list.
+            // the branchCode will be used later to select the actual branch configuration in the switch statement
+            // below.  0 = no branch, 1 = < branch only, 2 = > branch only, 3 = bothe branches.
+            int branchCode = 0;
 
-            boolean inside = true;
-            for (int i = 0; i < tuple.length; i++) {
-                if ((queryPlus[i]  <= tuple[i]) ||
-                        (queryMinus[i] > tuple[i]) ) {
-                    inside = false;
-                    break;
-                }
-            }
-            if (inside) {
-                result.addAll(this.value);
-            }
-
-            // Search the < branch of the k-d tree if the partition coordinate of the query point minus
-            // the cutoff distance is <= the partition coordinate of the k-d node. The < branch
+            // Search the < branch of the k-d tree if the partition coordinate of the queryPlus is
+            // <= the partition coordinate of the k-d node.  The < branch
             // must be searched when the cutoff distance equals the partition coordinate because the super
             // key may assign a point to either branch of the tree if the sorting or partition coordinate,
             // which forms the most significant portion of the super key, shows equality.
-            Future<List<VALUE_TYPE>> future = null;
-            if (ltChild != null) {
-                if (queryMinus[p] <= tuple[p]) {
-
-                    // Search the < branch with a child thread at as many levels of the tree as possible.
-                    // Create the child threads as high in the tree as possible for greater utilization.
-                    // If maxSubmitDepth == -1, there are no child threads.
-                    if (maximumSubmitDepth > -1 && depth <= maximumSubmitDepth) {
-                        threadList = new ArrayList<>();
-                        future =
-                                executor.submit( ltChild.searchKdTreeWithThread(threadList, queryPlus, queryMinus,
-                                        permutation, executor, maximumSubmitDepth, depth + 1) );
-                    } else {
-                        ltChild.searchKdTree(result, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth,depth + 1);
+            if (queryMinus[p] <= tuple[p]) {
+                // but only search if the ltChild pointer is not null;
+                if (ltChild != null) branchCode = 1;
+                // Search the > branch of the k-d tree if the partition coordinate of the queryPlus is
+                // >= the partition coordinate of the k-d node.  The < branch
+                // must be searched when the cutoff distance equals the partition coordinate because the super
+                // key may assign a point to either branch of the tree if the sorting or partition coordinate,
+                // which forms the most significant portion of the super key, shows equality.
+                if (queryPlus[p] >= tuple[p]) {
+                    // but only if the gtChild pointer is not null;
+                    if (gtChild != null) branchCode += 2;
+                    // while here check to see if there are values that could be inside the the
+                    // hypercube.
+                    if (value != null){
+                        // If the distance from the query node to the k-d node is within the cutoff distance
+                        // in all k dimensions, add the k-d node to a list.
+                        boolean inside = true;
+                        for (int i = 0; i < tuple.length; i++) {
+                            if ((queryPlus[i]  <= tuple[i]) ||
+                                    (queryMinus[i] > tuple[i]) ) {
+                                inside = false;
+                                break;
+                            }
+                        }
+                        if (inside) {
+                            result.add(this);
+                        }
                     }
                 }
+            } else {
+                if (gtChild != null && queryPlus[p] >= tuple[p]) branchCode = 2;
             }
 
-            // Search the > branch of the k-d tree if the partition coordinate of the query point plus
-            // the cutoff distance is >= the partition coordinate of the k-d node.  Note the transformation
-            // of this test: (query[p] + cut >= tuple[p]) -> (tuple[p] - query[p] <= cut).  The < branch
-            // must be searched when the cutoff distance equals the partition coordinate because the super
-            // key may assign a point to either branch of the tree if the sorting or partition coordinate,
-            // which forms the most significant portion of the super key, shows equality.
-            if (gtChild != null) {
-                if (queryPlus[p] >= tuple[p]) {
-                     gtChild.searchKdTree(result, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth,
-                            depth + 1);
-                }
-            }
+            switch (branchCode) {
+                case 0: // child pointer are both null so just return
+                    return;
+                case 1: // only go down the less than branch
+                    ltChild.searchKdTree(result, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, depth + 1);
+                    return;
+                case 2: // only go down the greater than branch
+                    gtChild.searchKdTree(result, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, depth + 1);
+                    return;
+                case 3: // go down both branches
+                    // get a future and another list ready in case a child thread is spawned
+                    Future<List<VALUE_TYPE>> future = null;
+                    ArrayList<KdNode<VALUE_TYPE>> threadResult = null;
+                    // check to see if there is a thread available and descend the less than branch with that thread.
+                    if (maximumSubmitDepth > -1 && depth <= maximumSubmitDepth) {
+                        threadResult = new ArrayList<>();
+                        future =
+                                executor.submit(ltChild.searchKdTreeWithThread(threadResult, queryPlus, queryMinus,
+                                        permutation, executor, maximumSubmitDepth, depth + 1));
+                    } else {
+                        // if no thread, just descend directly
+                        ltChild.searchKdTree(result, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, depth + 1);
+                    }
 
-            // If a child thread searched the < branch, get the result.
-            if (future != null) {
-                try {
-                    future.get();
-                    result.addAll(threadList);
-                } catch (Exception e) {
-                    throw new RuntimeException( "future exception: " + e.getMessage() );
-                }
+                    gtChild.searchKdTree(result, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, depth + 1);
+
+                    // If a child thread searched the < branch, get the result.
+                    if (future != null) {
+                        try {
+                            future.get();
+                            result.addAll(threadResult);
+                        } catch (Exception e) {
+                            throw new RuntimeException("future exception: " + e.getMessage());
+                        }
+                    }
+                    return;
             }
-            return;
         }
 
         /**
@@ -1555,8 +1577,7 @@ public class KdTree<VALUE_TYPE> {
          * {@link KdNode#searchKdTree searchKdTree} method.
          * </p>
          *
-         * @param result - ArrayList to which the values of k-d nodes that lie within the cutoff
-         *               distance of the query node will be added.
+         * @param result - ArrayList to which the k-d nodes that lie within the hypercube will be added.
          * @param queryPlus - Array containing the lager search bound for each dimension
          * @param queryMinus - Array containing the smaller search bound for each dimension
          * @param permutation - an array that indicates permutation of the reference arrays
@@ -1566,9 +1587,9 @@ public class KdTree<VALUE_TYPE> {
          * @return a {@link java.util.List List}{@code <}{@link KdNode}{@code >}
          * that contains the k-d nodes that lie within the cutoff distance of the query node
          */
-        private Callable searchKdTreeWithThread(final List<VALUE_TYPE> result, final long[] queryPlus, final long[] queryMinus, final int[] permutation,
-                                                              final ExecutorService executor, final int maximumSubmitDepth,
-                                                              final int depth) {
+        private Callable searchKdTreeWithThread(final ArrayList<KdNode<VALUE_TYPE>> result, final long[] queryPlus, final long[] queryMinus, final int[] permutation,
+                                                final ExecutorService executor, final int maximumSubmitDepth,
+                                                final int depth) {
             return new Callable() {
                 @Override
                 public Object call() {
@@ -1592,14 +1613,14 @@ public class KdTree<VALUE_TYPE> {
          * @param executor - a {@link java.util.concurrent.ExecutorService ExecutorService}
          * @param maximumSubmitDepth - the maximum tree depth at which a thread may be launched
          * @param depth - the depth in the k-d tree
-         * @return a code that indicates somthing about the search below.
+         * @return a code that indicates something about the search below.
          *           0 - nothing found or removed
-         *           1 - somthing found and removed but the node returned from is still needed
-         *          -1 - sonthing found and removed the node below is dead so can be pruned.
+         *           1 - something found and removed but the node returned from is still needed
+         *          -1 - something found and removed the node below is dead so can be pruned.
          */
         private int searchAndRemoveKdTree(final List<VALUE_TYPE> result, final long[] queryPlus, final long[] queryMinus, final int[] permutation,
-                                  final ExecutorService executor, final int maximumSubmitDepth,
-                                  final int depth) {
+                                          final ExecutorService executor, final int maximumSubmitDepth,
+                                          final int depth) {
 
             // Look up the partition.
             final int p = permutation[depth];
@@ -1724,9 +1745,9 @@ public class KdTree<VALUE_TYPE> {
          *          -1 - sonthing found and removed the node below is dead so can be pruned.
          */
         private Callable<Integer>
-            searchAndRemoveKdTreeWithThread(final List<VALUE_TYPE> result, final long[] queryPlus, final long[] queryMinus,
-                                            final int[] permutation, final ExecutorService executor,
-                                            final int maximumSubmitDepth, final int depth) {
+        searchAndRemoveKdTreeWithThread(final List<VALUE_TYPE> result, final long[] queryPlus, final long[] queryMinus,
+                                        final int[] permutation, final ExecutorService executor,
+                                        final int maximumSubmitDepth, final int depth) {
 
             return new Callable<Integer>() {
                 @Override
@@ -1851,7 +1872,7 @@ public class KdTree<VALUE_TYPE> {
          * <p>
          * The {@code printKdTree} method prints the k-d tree "sideways" with the root at the left.
          * </p>
-         * 
+         *
          * @param depth - the depth in the k-d tree
          */
         public void printKdTree(final long depth) {
@@ -1872,7 +1893,7 @@ public class KdTree<VALUE_TYPE> {
          * <p>
          * The {@code printTuple} method prints a tuple.
          * </p>
-         * 
+         *
          * @param p - the tuple
          */
         public static void printTuple(final long[] p) {
@@ -2067,7 +2088,7 @@ public class KdTree<VALUE_TYPE> {
                 fall(1);
             }
             return;
-       }
+        }
 
         /**
          * <p>
@@ -2109,7 +2130,7 @@ public class KdTree<VALUE_TYPE> {
      * The {@code KdTree} Constructor for KdTree
      * </p>
      *
-     * @param numPoints - Indicates the total number of Kdnodes to be allocated
+     * @param numPoints - Indicates the total number of KdNodes to be allocated
      * @param numPoints - Indicates the dimensionality of each point
      */
     public KdTree(final int numPoints, final int numDimensions){
@@ -2168,6 +2189,21 @@ public class KdTree<VALUE_TYPE> {
         }
         return copyToNode;
     }
+
+    /**
+     * <p>
+     * The {@code getNumDimensions} return the number of dimensions of each tuple, set in the constructor.
+     * </p>
+     */
+    public int getNumDimensions() { return numDimensions; }
+
+    /**
+     * <p>
+     * The {@code size} return the number of tuples added to the tree.
+     * </p>
+     */
+    public int size() { return numPointsInTree; }
+
 
     /**
      * <p>
@@ -2350,23 +2386,13 @@ public class KdTree<VALUE_TYPE> {
                 queryMinus[i] = query[i] - searchDistance;
             }
         }
-        List<VALUE_TYPE> resultValues = new ArrayList<VALUE_TYPE>();
-        root.searchKdTree(resultValues, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, 0);
-        return resultValues;
-    }
-
-    /**
-     * <p>
-     * The {@code searchAndRemove} search the tree for all nodes contained within the bounds
-     * set by queryPlus and queryMinus and return the values associated with those nodes.  uses multitreading
-     * </p>
-     *
-     * @param queryPlus - Array containing the lager search bound for each dimension
-     * @param queryMinus - Array containing the smaller search bound for each dimension
-     * @returns list of Values found in the search region
-     */
-    public List<VALUE_TYPE> searchTree(final long[] queryPlus, final long[] queryMinus) {
-        return searchTree(queryPlus, queryMinus, true);
+        ArrayList<KdNode<VALUE_TYPE>> results = new ArrayList<KdNode<VALUE_TYPE>>();
+        root.searchKdTree(results, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, 0);
+        ArrayList<VALUE_TYPE> values = new ArrayList<>();
+        for(KdNode kn : results){
+            values.addAll(kn.value);
+        }
+        return values;
     }
 
     /**
@@ -2377,10 +2403,9 @@ public class KdTree<VALUE_TYPE> {
      *
      * @param queryPlus - Array containing the lager search bound for each dimension
      * @param queryMinus - Array containing the smaller search bound for each dimension
-     * @param useThreads - Use threading established in the setThreads.
      * @returns list of Values found in the search region
      */
-    public List<VALUE_TYPE> searchTree(final long[] queryPlus, final long[] queryMinus, boolean useThreads) {
+    public List<VALUE_TYPE> searchTree(final long[] queryPlus, final long[] queryMinus) {
         // if the tree is not built yet, build it
         if (root == null) {
             buildTree();
@@ -2397,11 +2422,78 @@ public class KdTree<VALUE_TYPE> {
         }
         // search the tree to get the list of values
         List<VALUE_TYPE> resultValues = new ArrayList<VALUE_TYPE>();
-        if (useThreads )
-            root.searchKdTree(resultValues, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, 0);
-        else
-            root.searchKdTree(resultValues, queryPlus, queryMinus, permutation, executor, -1, 0);
-        return resultValues;
+        ArrayList<KdNode<VALUE_TYPE>> results = new ArrayList<KdNode<VALUE_TYPE>>();
+        root.searchKdTree(results, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, 0);
+        ArrayList<VALUE_TYPE> values = new ArrayList<>();
+        for(KdNode kn : results){
+            values.addAll(kn.value);
+        }
+        return values;
+    }
+
+
+    /**
+     * <p>
+     * The {@code searchAndRemove} search the tree for all nodes contained within the searchDistanece
+     *  query and return the values associated with those knodes.
+     * </p>
+     *
+     * @param query - Array containing the center point of a search region.  lenth
+     * must match dimensions specified in constructor
+     * @param searchDistance - the distance from the query point to be searched.
+     * @returns list of Values found in the search region
+     */
+    public void searchTree(List<long[]> tuples, List<VALUE_TYPE> values, long query[], long searchDistance) {
+        // if the tree is not built yet, build it
+
+        // calculate the plus and minus arrays while checking for overflow
+        long queryPlus[]  = new long[numDimensions];
+        long queryMinus[] = new long[numDimensions];
+        for (int i=0; i<numDimensions; i++) {
+            if (query[i] > 0 && (Long.MAX_VALUE - query[i]) < searchDistance) {
+                queryPlus[i]  =  Long.MAX_VALUE;
+            } else {
+                queryPlus[i]  =  query[i] + searchDistance;
+            }
+            if ((query[i] < 0) && ((query[i] - Long.MIN_VALUE) < searchDistance)) {
+                queryMinus[i] = Long.MIN_VALUE;
+            } else {
+                queryMinus[i] = query[i] - searchDistance;
+            }
+        }
+        searchTree(tuples, values, queryPlus, queryMinus);
+        return;
+    }
+
+    /**
+     * <p>
+     * The {@code searchTree} search the tree for all nodes contained within the bounds
+     * set by queryPlus and queryMinus and return the values and tuples associated with those nodes.
+     * </p>
+     *
+     * @param tuples - Array that upon return will contain the tuples found within the query BB
+     * @param values - Array that upon return will contain the values found within the query BB
+     * @param queryPlus - Array containing the lager search bound for each dimension
+     * @param queryMinus - Array containing the smaller search bound for each dimension
+     */
+    public void searchTree(List<long[]> tuples, List<VALUE_TYPE> values, final long[] queryPlus, final long[] queryMinus) {
+
+        // check that the values in Plus are > than the values in Minus
+        for(int i = 0;  i < queryMinus.length; i++) {
+            if (queryMinus[i] > queryPlus[i]) {
+                long T = queryMinus[i];
+                queryMinus[i] = queryPlus[i];
+                queryPlus[i] = T;
+            }
+        }
+        ArrayList<KdNode<VALUE_TYPE>> results = new ArrayList<KdNode<VALUE_TYPE>>();
+        root.searchKdTree(results, queryPlus, queryMinus, permutation, executor, maximumSubmitDepth, 0);
+        for(KdNode kn : results){
+            for(Object val : kn.value) {
+                tuples.add(kn.tuple);
+                values.add((VALUE_TYPE) val);
+            }
+        }
     }
 
     /**
@@ -2555,7 +2647,7 @@ public class KdTree<VALUE_TYPE> {
      * The {@code randomIntegerInInterval} method creates a random int in the interval [min, max].
      * See http://stackoverflow.com/questions/6218399/how-to-generate-a-random-number-between-0-and-1
      * </p>
-     * 
+     *
      * @param min - the minimum int value desired
      * @param max - the maximum int value desired
      * @returns a random int
@@ -2563,7 +2655,7 @@ public class KdTree<VALUE_TYPE> {
     private static int randomIntegerInInterval(final int min, final int max) {
         return min + (int) ( Math.random() * (max - min) );
     }
-	
+
     /**
      * <p>
      * Define a simple data set then build a k-d tree.
@@ -2572,7 +2664,7 @@ public class KdTree<VALUE_TYPE> {
     public static void main(String[] args) {
 
         // Set the defaults then parse the input arguments.
-        int numPoints = 262144;
+        int numPoints = 16*262144;
         int extraPoints = 100;
         int numDimensions = 4;
         int numThreads = 8;
@@ -2582,27 +2674,27 @@ public class KdTree<VALUE_TYPE> {
 
         for (int i = 0; i < args.length; i++) {
             if ( args[i].equals("-n") || args[i].equals("--numPoints") ) {
-                numPoints = Integer.parseInt(args[++i]); 
+                numPoints = Integer.parseInt(args[++i]);
                 continue;
             }
             if ( args[i].equals("-x") || args[i].equals("--extraPoints") ) {
-                extraPoints = Integer.parseInt(args[++i]); 
+                extraPoints = Integer.parseInt(args[++i]);
                 continue;
             }
             if ( args[i].equals("-d") || args[i].equals("--numDimensions") ) {
-                numDimensions = Integer.parseInt(args[++i]); 
+                numDimensions = Integer.parseInt(args[++i]);
                 continue;
             }
             if ( args[i].equals("-t") || args[i].equals("--numThreads") ) {
-                numThreads = Integer.parseInt(args[++i]); 
+                numThreads = Integer.parseInt(args[++i]);
                 continue;
             }
             if ( args[i].equals("-s") || args[i].equals("--searchDistance") ) {
-                searchDistance = Integer.parseInt(args[++i]); 
+                searchDistance = Integer.parseInt(args[++i]);
                 continue;
             }
             if ( args[i].equals("-p") || args[i].equals("--maximumNodesToPrint") ) {
-                maximumNumberOfNodesToPrint = Integer.parseInt(args[++i]); 
+                maximumNumberOfNodesToPrint = Integer.parseInt(args[++i]);
                 continue;
             }
             if ( args[i].equals("-m") || args[i].equals("--nearestNeighborCount") ) {
@@ -2635,7 +2727,7 @@ public class KdTree<VALUE_TYPE> {
         myKdTree.buildTree();
 
         /*****************************
-        // value validity test
+         // value validity test
          *****************************/
         // set the bounds of a tre search to return all values
         long[] qp = new long[numPoints];
@@ -2675,7 +2767,7 @@ public class KdTree<VALUE_TYPE> {
         if ( !kdNodeValues.isEmpty() ) {
             maximumNumberOfNodesToPrint = Math.min( maximumNumberOfNodesToPrint, kdNodeValues.size() );
             System.out.println("List of values associated with the first " + maximumNumberOfNodesToPrint + " k-d nodes within " +
-                               searchDistance + "-unit search distance follows:\n");
+                    searchDistance + "-unit search distance follows:\n");
             for (int i = 0; i < maximumNumberOfNodesToPrint; i++) {
                 System.out.println(kdNodeValues.get(i));
             }
@@ -2685,8 +2777,15 @@ public class KdTree<VALUE_TYPE> {
         myKdTree.setNumThreads(1);
         List<Integer> kdNodeValuesAlt = myKdTree.searchTree(query, searchDistance);
         if (kdNodeValues.size() != kdNodeValuesAlt.size() || !kdNodeValues.containsAll(kdNodeValuesAlt))
-            System.out.print("Single threaded search does not match multithreaded search");
+            System.out.println("Single threaded search does not match multithreaded search");
         myKdTree.setNumThreads(8);
+
+        List<long[]> tuples = new ArrayList<long[]>();
+        kdNodeValuesAlt.clear();
+        myKdTree.searchTree(tuples, kdNodeValuesAlt, query, searchDistance);
+        if (kdNodeValues.size() != kdNodeValuesAlt.size() || !kdNodeValues.containsAll(kdNodeValuesAlt))
+            System.out.println("tuple + value search != value only search");
+
 
         /*****************************
          // copy constructor test
@@ -2724,7 +2823,7 @@ public class KdTree<VALUE_TYPE> {
 
         // It's not possible to find more nearest neighbors than there are points.
         numNearestNeighbors = Math.min(numNearestNeighbors, numPoints + extraPoints - 1);
-		
+
         // Search the k-d tree for the numNearestNeighbors nearest neighbors to the first point.
         long nnTime = System.currentTimeMillis();
         // search the tree to get the heap of KdNodes
@@ -2798,9 +2897,7 @@ public class KdTree<VALUE_TYPE> {
         // Shut down the ExecutorService.
         myKdTree.shutdown();
 
-         System.exit(0);
+        System.exit(0);
     }
 
- } //class KdTree
-
-
+} //class KdTree
